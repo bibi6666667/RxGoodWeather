@@ -57,14 +57,15 @@ class ViewController: UIViewController {
         
         let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance) // UI작업 시 DispatchQueue.main.async 대신 사용하는 Rx기능
-            .catchErrorJustReturn(WeatherResult.empty) // 도시 키워드가 잘못되어 응답이 실패하면, 대신 빈 Weather 객체를 반환한다
+            .asDriver(onErrorJustReturn: WeatherResult.empty) // driver를 리턴해 준다.
+            
         
         search.map {"\($0.main.temp) ℃"}
-            .bind(to: self.temeratureLabel.rx.text) // RxCocoa가 지원하는 기능 - 어떤 UI 프로퍼티와 어떤 값(여기서는 String) 을 바인딩함
+            .drive(self.temeratureLabel.rx.text)
             .disposed(by: disposeBag)
         
         search.map {"\($0.main.humidity) %"}
-            .bind(to: self.humidityLabel.rx.text)
+            .drive(self.humidityLabel.rx.text)
             .disposed(by: disposeBag)
         
     }
