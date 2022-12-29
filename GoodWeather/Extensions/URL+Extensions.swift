@@ -1,5 +1,5 @@
 //
-//  URL+Exttensions.swift
+//  URL+Extensions.swift
 //  GoodWeather
 //
 //  Created by Bibi on 2022/12/28.
