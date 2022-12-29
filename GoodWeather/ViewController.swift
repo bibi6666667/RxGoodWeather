@@ -54,13 +54,18 @@ class ViewController: UIViewController {
         
         let resource = Resource<WeatherResult>(url: url)
         // resource를 만들면 URLSessionExtension을 사용할 수 있다.
-        URLRequest.load(resource: resource)
+        
+        let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance) // UI작업 시 DispatchQueue.main.async 대신 사용하는 Rx기능
             .catchErrorJustReturn(WeatherResult.empty) // 도시 키워드가 잘못되어 응답이 실패하면, 대신 빈 Weather 객체를 반환한다
-            .subscribe(onNext: { result in
-                let weather = result.main
-                self.displayWeather(weather)
-            }).disposed(by: disposeBag)
+        
+        search.map {"\($0.main.temp) ℃"}
+            .bind(to: self.temeratureLabel.rx.text) // RxCocoa가 지원하는 기능 - 어떤 UI 프로퍼티와 어떤 값(여기서는 String) 을 바인딩함
+            .disposed(by: disposeBag)
+        
+        search.map {"\($0.main.humidity) %"}
+            .bind(to: self.humidityLabel.rx.text)
+            .disposed(by: disposeBag)
         
     }
 
