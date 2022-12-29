@@ -54,11 +54,13 @@ class ViewController: UIViewController {
         
         let resource = Resource<WeatherResult>(url: url)
         // resource를 만들면 URLSessionExtension을 사용할 수 있다.
-        
-        let search = URLRequest.load(resource: resource)
-            .observeOn(MainScheduler.instance) // UI작업 시 DispatchQueue.main.async 대신 사용하는 Rx기능
-            .asDriver(onErrorJustReturn: WeatherResult.empty) // driver를 리턴해 준다.
             
+        let search = URLRequest.load(resource: resource)
+            .observeOn(MainScheduler.instance)
+            .catchError { error in // 에러 발생시 아래 구문 블럭과 같이 처리
+                print(error.localizedDescription)
+                return Observable.just(WeatherResult.empty)
+            }.asDriver(onErrorJustReturn: WeatherResult.empty)
         
         search.map {"\($0.main.temp) ℃"}
             .drive(self.temeratureLabel.rx.text)
