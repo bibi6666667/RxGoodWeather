@@ -57,6 +57,7 @@ class ViewController: UIViewController {
             
         let search = URLRequest.load(resource: resource)
             .observeOn(MainScheduler.instance)
+            .retry(3)
             .catchError { error in // 에러 발생시 아래 구문 블럭과 같이 처리
                 print(error.localizedDescription)
                 return Observable.just(WeatherResult.empty)
